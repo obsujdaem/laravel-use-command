@@ -11,5 +11,9 @@
 |
 */
 
+use App\Http\Controllers\RegistrationController;
 use Illuminate\Support\Facades\Route;
 
+
+Route::get('/', [RegistrationController::class, 'index']);
+Route::post('/registration', [RegistrationController::class, 'store'])->name('registration');
