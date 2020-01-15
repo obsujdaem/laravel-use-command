@@ -20,6 +20,7 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         'http://192.168.99.100:1111',
-        'http://192.168.99.100:1111/registration'
+        'http://192.168.99.100:1111/registration',
+        'http://192.168.99.100:1111/post/add'
     ];
 }

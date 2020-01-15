@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Model\PostModel;
 use App\Model\ServerModel;
 use App\Model\User;
 use Illuminate\Console\Command;
@@ -17,14 +18,14 @@ class movingUser extends Command
      */
     protected $signature = 'command:moving
                         {user : ID пользователя}
-                        {server : ID сервера куда переместить пользователя}';
+                        {server : ID сервера куда переместить user,posts}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'input {users.id} to {servers.id} to move user on additional server';
+    protected $description = 'input {users.id} to {servers.id} to move user.posts on additional server';
 
     /**
      * Execute the console command.
@@ -35,36 +36,54 @@ class movingUser extends Command
     {
         $user = User::find($this->argument('user'));
         $server = ServerModel::find($this->argument('server'));
+        $posts = PostModel::where('user_id', $this->argument('user'))->get();
+
+        $postsCount = count($posts);
 
         if ($user) {
-            echo "Пользователь $user->login найден";
+            $this->comment("Пользователь $user->login найден");
 
             if ($server) {
-                echo "Сервер $server->host найден";
-                $user->delete();
-                DB::purge('additional_mysql');
-                Config::set('database.connections.additional_mysql.host', $server->host);
+                $this->comment("Сервер $server->host найден");
 
-                DB::connection('additional_mysql')->table('users')->insertGetId([
-                    'login' => "$user->login",
-                    'password' => "$user->password",
-                    'email' => "$user->email",
-                    'created_at' => "$user->created_at",
-                    'updated_at' => "$user->updated_at"
-                ]);
+                if ($postsCount > 0) {
+                    $this->comment("У данного пользователя : $postsCount post(s) ");
+
+                    DB::purge('additional_mysql');
+                    Config::set('database.connections.additional_mysql.host', $server->host);
+
+                    foreach ($posts as $post) {
+                        DB::connection('additional_mysql')->table('posts')->insertGetId([
+                            'title' => "$post->title",
+                            'text' => "$post->text",
+                            'user_id' =>$post->user_id,
+                            'created_at' => "$post->created_at",
+                            'updated_at' => "$post->updated_at"
+                        ]);
+                    }
+
+                    foreach ($posts as $post) {
+                        $post->delete();
+                    }
+
+                    $this->question("$postsCount post(s) пользователя $user->login был(и) перенесен(ы) на сервер $server->host");
+
+                } else {
+                    $this->question("У данного пользователя нет постов ");
+                }
 
             } else {
-                echo 'Сервер не найден  ';
+                $this->error('Сервер не найден');
             }
 
         } else {
-            echo 'Пользователь не найден  ';
+            $this->error('Пользователь не найден');
 
             if ($server) {
-                echo "Сервер $server->host найден";
+                $this->comment("Сервер $server->host найден");
 
             } else {
-                echo 'Сервер не найден  ';
+                $this->error('Сервер не найден');
             }
         }
     }

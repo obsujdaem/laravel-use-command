@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateUsersAdditionalServersTable extends Migration
+class CreateAdditionalPostsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -16,7 +16,6 @@ class CreateUsersAdditionalServersTable extends Migration
      */
     public function up()
     {
-
         $servers = ServerModel::all();
 
         foreach ($servers as $server) {
@@ -24,11 +23,11 @@ class CreateUsersAdditionalServersTable extends Migration
             DB::purge('additional_mysql');
             Config::set('database.connections.additional_mysql.host', $server->host);
 
-            Schema::connection('additional_mysql')->create('users', function (Blueprint $table) {
+            Schema::connection('additional_mysql')->create('posts', function (Blueprint $table) {
                 $table->bigIncrements('id');
-                $table->string('login');
-                $table->string('password');
-                $table->string('email');
+                $table->bigInteger('user_id')->unsigned();
+                $table->string('title');
+                $table->text('text');
                 $table->timestamps();
             });
         }
@@ -41,6 +40,6 @@ class CreateUsersAdditionalServersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users_additional_servers');
+        Schema::dropIfExists('additional_posts');
     }
 }

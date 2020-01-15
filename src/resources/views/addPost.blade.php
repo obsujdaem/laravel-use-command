@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>регистрация</title>
+    <title>добавление поста</title>
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
@@ -75,19 +75,23 @@
     </style>
 </head>
 <body>
-<h1 style="margin-left: 30px;">Регистрация</h1>
-<form action="{{route('registration')}}" method="post">
-    <label for="login">введите имя</label>
-    <input type="text" name="login" id="login">
+<h1 style="margin-left: 30px;">Добавление поста</h1>
+<form action="{{route('post_add')}}" method="post">
+    <label for="title">введите заголовок</label>
+    <input type="text" name="title" id="title">
 
-    <label for="password">введите пароль</label>
-    <input type="password" name="password" id="password">
+    <label for="text">введите текст</label>
+    <textarea name="text" id="text" cols="30" rows="10"></textarea>
 
-    <label for="email">введите имейл</label>
-    <input type="email" name="email" id="email">
+    <label for="user_id"></label>
+    <select name="user_id" id="user_id" style="margin-top: 20px;">
+    @foreach($users as $user)
+            <option value="{{$user->id}}">User: {{$user->login}} ( ID : {{$user->id}} )</option>
+    @endforeach
+    </select>
 
-    <input type="submit" value="регистрация" id="submit">
+    <input type="submit" value="добавить пост" id="submit">
 </form>
-<a href="{{route('post')}}" style="margin-left: 30px; font-size: 28px; font-weight: 700;">Добавить post</a>
+<a href="{{route('main')}}" style="margin-left: 30px; font-size: 28px; font-weight: 700;">Добавить user</a>
 </body>
 </html>
