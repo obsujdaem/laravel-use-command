@@ -11,5 +11,14 @@
 |
 */
 
+use App\Http\Controllers\AddPostController;
+use App\Http\Controllers\RegistrationController;
 use Illuminate\Support\Facades\Route;
 
+
+Route::get('/', [RegistrationController::class, 'index']);
+Route::post('/', [RegistrationController::class, 'index'])->name('main');
+Route::post('/registration', [RegistrationController::class, 'store'])->name('registration');
+
+Route::get('/post/add', [AddPostController::class, 'index'])->name('post');
+Route::post('/post/add', [AddPostController::class, 'store'])->name('post_add');
